@@ -4,11 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
+	"net"
+	"strconv"
+	"time"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	ibclient "github.com/infobloxopen/infoblox-go-client/v2"
-	"strconv"
-	"time"
 )
 
 func dataSourceNetwork() *schema.Resource {
@@ -49,6 +52,55 @@ func dataSourceNetwork() *schema.Resource {
 							Computed:    true,
 							Description: "The Extensible attributes for network datasource, as a map in JSON format",
 						},
+						"utilization": {
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The utilization of the network",
+						},
+						"est_available_ip": {
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The estimated available IPs in the network",
+						},
+						"options": {
+							Type:     schema.TypeList,
+							Computed: true,
+							Description: "An array of DHCP option structs that lists the DHCP options associated with the object. An option sets the" +
+								"value of a DHCP option that has been defined in an option space. DHCP options describe network configuration settings" +
+								"and various services available on the network. These options occur as variable-length fields at the end of DHCP messages." +
+								"When defining a DHCP option, at least a ‘name’ or a ‘num’ is required.",
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"name": {
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "Name of the DHCP option.",
+									},
+									"num": {
+										Type:        schema.TypeInt,
+										Computed:    true,
+										Description: "The code of the DHCP option.",
+									},
+									"use_option": {
+										Type:     schema.TypeBool,
+										Computed: true,
+										Description: "Only applies to special options that are displayed separately from other options and have a use flag. " +
+											"These options are: `routers`, `router-templates`, `domain-name-servers`, `domain-name`, `broadcast-address`, " +
+											"`broadcast-address-offset`, `dhcp-lease-time`, `dhcp6.name-servers`",
+									},
+									"value": {
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "Value of the DHCP option.",
+									},
+									"vendor_class": {
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The name of the space this DHCP option is associated to.",
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -62,7 +114,7 @@ func dataSourceIPv4NetworkRead(ctx context.Context, d *schema.ResourceData, m in
 	var diags diag.Diagnostics
 
 	n := &ibclient.Ipv4Network{}
-	n.SetReturnFields(append(n.ReturnFields(), "extattrs"))
+	n.SetReturnFields(append(n.ReturnFields(), "extattrs", "options", "utilization"))
 
 	filters := filterFromMap(d.Get("filters").(map[string]interface{}))
 	qp := ibclient.NewQueryParams(false, filters)
@@ -115,17 +167,41 @@ func flattenIpv4Network(network ibclient.Ipv4Network) (map[string]interface{}, e
 		"id":           network.Ref,
 		"network_view": network.NetworkView,
 		"ext_attrs":    string(ea),
+		"utilization":  network.Utilization,
 	}
 
 	if network.Network != nil {
 		res["cidr"] = *network.Network
+		res["est_available_ip"] = calculateAvailableIPv4s(*network.Network, network.Utilization)
 	}
 
 	if network.Comment != nil {
 		res["comment"] = *network.Comment
 	}
 
+	if network.Options != nil {
+		res["options"] = convertDhcpOptionsToInterface(network.Options)
+	}
+
 	return res, nil
+}
+
+func calculateAvailableIPv4s(network string, utilization uint32) uint32 {
+	_, ipV4Net, err := net.ParseCIDR(network)
+	if err != nil {
+		return 0
+	}
+	maskSize, _ := ipV4Net.Mask.Size()
+
+	totalIPs := uint32(math.Pow(2, float64(32-maskSize))) - 2
+
+	if totalIPs < 0 { // /31 or /32
+		totalIPs = 0
+	}
+
+	availableIPs := uint32(float64(totalIPs) * (1 - float64(utilization)/1000.0))
+
+	return availableIPs
 }
 
 func flattenIpv6Network(network ibclient.Ipv6Network) (map[string]interface{}, error) {
@@ -152,6 +228,10 @@ func flattenIpv6Network(network ibclient.Ipv6Network) (map[string]interface{}, e
 
 	if network.Comment != nil {
 		res["comment"] = *network.Comment
+	}
+
+	if network.Options != nil {
+		res["options"] = convertDhcpOptionsToInterface(network.Options)
 	}
 
 	return res, nil
