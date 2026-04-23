@@ -1,5 +1,39 @@
 # Infoblox Go Client Release Notes
 
+
+## v2.12.0
+
+### Major Changes
+
+- Security: Updated the minimum supported Go version to 1.25.8 to address CVE-2025-68121 in the Go toolchain and standard library.
+
+## v2.11.0
+
+### Release Summary
+
+- This release introduces new features aimed at managing DNS resource record types HTTPS and SVCB Records (Compatible with NIOS 9.0.7 using WAPI v2.13.7). Updated Go Version to v1.24.7 and fixed security vulnerabilities by upgrading required dependencies.
+
+### Major Changes
+
+- Upgraded go version from 1.21 to 1.24.7
+
+### Minor Changes
+
+- Added Create, Read, Update and Delete operations for HTTPS and SVCB Records.
+- Added structs `RecordHttps` and `RecordSvcb` for HTTPS and SVCB Record.
+
+## v2.10.0
+
+### Release Summary
+
+- This release introduces several significant enhancements and new features aimed at management and Alias Record, NS Record, IPV4 SharedNetwork, IPV4 FixedAddress, IPV4 Range and IPV4 RangeTemplate objects.
+
+### Minor Changes
+
+- Added Create, Read, Update and Delete operations for Alias Record, NS Record, IPV4 SharedNetwork, IPV4 Range and IPV4 RangeTemplate objects.
+- Added GetAllFixedAddress for IPV4 FixedAddress object.
+- Modified AllocateIP, UpdateFixedAddress functions to support IPV4 FixedAddress object.
+
 ## v2.9.0
 
 ### Release Summary

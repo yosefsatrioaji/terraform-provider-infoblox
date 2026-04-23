@@ -1,4 +1,4 @@
-resource "infoblox_ipv4_range" "range3" {
+resource "infoblox_ipv4_range" "range" {
   start_addr = "17.0.0.221"
   end_addr   = "17.0.0.240"
   options {
@@ -15,6 +15,7 @@ resource "infoblox_ipv4_range" "range3" {
   disable              = false
   member = {
     name = "infoblox.localdomain"
+    ipv4addr = "192.168.10.10"
   }
   server_association_type= "MEMBER"
   ext_attrs = jsonencode({

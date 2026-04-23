@@ -1,5 +1,35 @@
 # Changelog
 
+## [v2.13.0](https://github.com/infobloxopen/terraform-provider-infoblox/tree/v2.13.0) (2026-04-02)
+
+- Upgraded Go version to v1.25.8 and refreshed dependencies for better compatibility and security.
+
+## [v2.12.0](https://github.com/infobloxopen/terraform-provider-infoblox/tree/v2.12.0) (2026-03-10)
+
+- Data source updated to support VLAN.
+
+## [v2.11.0](https://github.com/infobloxopen/terraform-provider-infoblox/tree/v2.11.0) (2025-10-20)
+
+- Improved error handling in data sources by treating "not found" responses as valid empty results, enhancing stability.
+- Upgraded Go to v1.24.7 and refreshed dependencies for better compatibility and security.
+- Minor refactoring to simplify error handling and remove redundant checks.
+
+## [v2.10.0](https://github.com/infobloxopen/terraform-provider-infoblox/tree/v2.10.0) (2025-4-25)
+- New Resources:
+  - infoblox_alias_record
+  - infoblox_ns_record
+  - infoblox_ipv4_shared_network
+  - infoblox_ipv4_fixed_address
+  - infoblox_ipv4_range
+  - infoblox_ipv4_range_template
+- New Datasources:
+  - infoblox_alias_record
+  - infoblox_ns_record
+  - infoblox_ipv4_shared_network
+  - infoblox_ipv4_fixed_address
+  - infoblox_ipv4_range
+  - infoblox_ipv4_range_template
+
 ## [v2.9.0](https://github.com/infobloxopen/terraform-provider-infoblox/tree/v2.9.0) (2025-1-31)
 - Upgraded the base WAPI version to v2.12.3.
 - New Resources:

@@ -6,7 +6,32 @@ The data source for the network object allows you to get the following parameter
 * `cidr`: the network block which corresponds to the network, in CIDR notation. Example: `192.0.17.0/24`
 * `comment`: a description of the network. This is a regular comment. Example: `Untrusted network`.
 * `ext_attrs`: The set of extensible attributes, if any. The content is formatted as string of JSON map. Example: `"{\"Owner\":\"State Library\",\"Administrator\":\"unknown\"}"`.
-
+* `options`: An array of DHCP option structs that lists the DHCP options associated with the object. The description of the fields of `options` is as follows:
+    * `name`: The Name of the DHCP option. Example: `domain-name-servers`.
+    * `num`: The code of the DHCP option. Example: `6`.
+    * `value`: The value of the option. Example: `11.22.33.44`.
+    * `vendor_class`: The name of the space this DHCP option is associated to. Default value is `DHCP`.
+    * `use_option`:Only applies to special options that are displayed separately from other options and have a use flag. These options are `router`,
+      `router-templates`, `domain-name-servers`, `domain-name`, `broadcast-address`, `broadcast-address-offset`, `dhcp-lease-time`, and `dhcp6.name-servers`.
+```terraform
+options {
+    name         = "dhcp-lease-time"
+    value        = "43200"
+    vendor_class = "DHCP"
+    num          = 51
+    use_option   = true
+  }
+```
+* `vlans`: An array of VLAN structs that lists the VLANs associated with the network object.  
+    * `id`: The unique identifier of the VLAN object in Infoblox. Example: `201`
+    * `name`: The name of the VLAN as defined in Infoblox. Example: `PROD-APP-100`
+```terraform
+vlans {
+    id          = 201
+    name        = "PROD-APP-100"
+  }
+```
+* `utilization`: The network utilization in percentage. Example: `0`
 
 For usage of filters, add the fields as keys and appropriate values to be passed to the keys like `name`, `view` corresponding to object.
 From the below list of supported arguments for filters,  use only the searchable fields for retriving the matching records.

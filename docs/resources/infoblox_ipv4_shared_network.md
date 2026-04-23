@@ -10,15 +10,15 @@ The following list describes the parameters you can define for the `infoblox_ipv
 * `use_options`: optional, specifies the use flag for options. Example: `true`. Default value is `false`.
 * `options`: optional, specifies an array of DHCP option structs that lists the DHCP options associated with the object. The description of the fields of `options` is as follows:
     * `name`: required, specifies the Name of the DHCP option. Example: `domain-name-servers`.
-    * `num`: optional, specifies the code of the DHCP option. Example: `6`.
-    * `value`: required, specifies the value of the option. Example: `43200`.
+    * `num`: required, specifies the code of the DHCP option. Example: `6`.
+    * `value`: required, specifies the value of the option. Example: `11.22.33.44`.
     * `vendor_class`: optional, specifies the name of the space this DHCP option is associated to. Default value is `DHCP`.
     * `use_option`: optional, only applies to special options that are displayed separately from other options and have a use flag. These options are `router`, 
   `router-templates`, `domain-name-servers`, `domain-name`, `broadcast-address`, `broadcast-address-offset`, `dhcp-lease-time`, and `dhcp6.name-servers`.
 
 Example for options field:
 ```terraform
-option { 
+options { 
     name = "domain-name-servers"
     use_option = true
     value = "11.22.33.44"
@@ -26,16 +26,27 @@ option {
 ```
 Default value for options is:
 ```terraform
-option { 
+options { 
     name = "dhcp-lease-time"
     num = 51
-    use_option = true
+    use_option = false  
     value = "43200"
     vendor_class = "DHCP"
   }
 ```
 * `comment`: optional, specifies the description of the record. This is a regular comment. Example: `Temporary Ipv4 Shared Network`.
 * `ext_attrs`: optional, specifies the set of extensible attributes of the record, if any. The content is formatted as string of JSON map. Example: `"{\"Site\":"Vancouver"}"`
+
+!> When configuring the options parameter, you must define the default option dhcp-lease-time to avoid the undesirable changes that can occur when the next terraform apply command runs. The sub parameters name, num, and value are required. An example block is as follows:
+```terraform
+options {
+  name         = "dhcp-lease-time"
+  value        = "43200"
+  vendor_class = "DHCP"
+  num          = 51
+  use_option   = false
+}
+```
 
 ### Example of an Ipv4 Shared Network Resource Block:
  ```hcl
@@ -62,6 +73,13 @@ resource "infoblox_ipv4_shared_network" "shared_network_full_parameters" {
     vendor_class = "DHCP"
     num = 6
     use_option = true
+  }
+  options {
+    name = "dhcp-lease-time"
+    num = 51
+    use_option = false  
+    value = "43200"
+    vendor_class = "DHCP"
   }
 }
  ```
