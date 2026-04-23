@@ -61,6 +61,7 @@ func dataSourceNetwork() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Description: "The estimated available IPs in the network",
+						},
 						"vlans": {
 							Type:        schema.TypeList,
 							Computed:    true,
