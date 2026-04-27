@@ -1,2 +1,4 @@
 build-output/
 .idea/
+build/
+package/

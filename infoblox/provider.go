@@ -4,16 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	log "github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	ibclient "github.com/infobloxopen/infoblox-go-client/v2"
 	"math"
 	"reflect"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
+	log "github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	ibclient "github.com/infobloxopen/infoblox-go-client/v2"
 )
 
 // Common parameters
@@ -222,6 +223,7 @@ func Provider() *schema.Provider {
 			"infoblox_ipv4_range":             resourceRange(),
 			"infoblox_ipv4_range_template":    resourceRangeTemplate(),
 			"infoblox_ipv4_shared_network":    resourceIpv4SharedNetwork(),
+			"infoblox_vlan":                   resourceVlan(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"infoblox_ipv4_network":           dataSourceIPv4Network(),
